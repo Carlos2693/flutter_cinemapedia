@@ -51,7 +51,7 @@ class _MovieHorizontalListViewState extends State<MovieHorizontalListView> {
       child: Column(
         children: [
           if (widget.title != null || widget.subTitle != null)
-            _Title(title: widget.title, subTitle: widget.subTitle),
+            _Title(title: widget.title ?? '', subTitle: widget.subTitle ?? ''),
           Expanded(
             child: ListView.builder(
               controller: scrollController,
