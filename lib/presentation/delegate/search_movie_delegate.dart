@@ -17,13 +17,21 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
 
   SearchMovieDelegate({required this.searchMovies});
 
-  void _onQueryChanged(String query) {
+  void clearStreams() {
+    debounceMovies.close();
+  }
 
-    print('Query stream cambio');
+  void _onQueryChanged(String query) {
     if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
 
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      //!buscar pelicula y emitir al stream
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+      if (query.isEmpty) {
+        debounceMovies.add([]);
+        return;
+      }
+
+      final movies = await searchMovies(query);
+      debounceMovies.add(movies);
     });
   }
 
@@ -46,7 +54,10 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      onPressed: () => close(context, null),
+      onPressed: () {
+        clearStreams();
+        close(context, null);
+      },
       icon: const Icon(Icons.arrow_back_ios_new_rounded),
     );
   }
@@ -72,7 +83,10 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
           itemBuilder: (context, index) {
             return _MovieItem(
               movie: movies[index],
-              onMovieSelected: close,
+              onMovieSelected: (context, movie) {
+                clearStreams();
+                close(context, movie);
+              },
             );
           }
         );
