@@ -29,17 +29,14 @@ class CustomAppbar extends ConsumerWidget {
               IconButton(
                 onPressed: () async {
 
-                  final movieRepository = ref.read(movieRepositoryProvider);
+                  // TODO: final searchedMovies = ref.read(searchedMoviesProvider);
                   final searhQuery = ref.read(searchQueryProvider);
 
                   showSearch<Movie?>(
                     query: searhQuery,
                     context: context,
                     delegate: SearchMovieDelegate(
-                      searchMovies: (query) {
-                        ref.read(searchQueryProvider.notifier).update((state) => query);
-                        return movieRepository.searchMovies(query);
-                      }
+                      searchMovies: ref.read(searchedMoviesProvider.notifier).searchMoviesByQuery
                     )
                   ).then((movie) {
                     if (movie == null) return;
